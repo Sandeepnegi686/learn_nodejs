@@ -1,0 +1,3 @@
+hello from async code
+ new async data
+ new async data
