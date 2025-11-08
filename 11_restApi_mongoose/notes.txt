@@ -1,0 +1,7 @@
+Schema	Blueprint / structure of documents	Table structure / class definition	userSchema
+
+Model	Interface to interact with the collection	Object that talks to DB	User
+
+Collection	Actual database storage	Table in SQL	users
+
+Document	A single record in the collection	Row in SQL	{ name: "Sandeep" }

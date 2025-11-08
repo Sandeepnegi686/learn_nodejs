@@ -1,0 +1,7 @@
+<%- include('../components/header.ejs') %>
+
+<label>All Products</label>
+
+<% if (products.length) { products?.map(product => { %>
+<p><%= product.name %></p>
+<% }) %> <% } %>
