@@ -42,11 +42,16 @@ async function createUser(req, res) {
 async function updateUser(req, res) {
   try {
     const { id } = req.params;
-    const data = req.body;
-    const newUser = await UserModel.findByIdAndUpdate(id, data, {
-      new: true,
-    });
-    res.json({ message: "User Updated", data: newUser });
+    // const data = req.body;
+    // const newUser = await UserModel.findByIdAndUpdate(id, data, {
+    //   new: true,
+    // });
+    const newUser = await UserModel.findByIdAndUpdate(
+      id,
+      { $set: { age: 100 } },
+      { new: true }
+    );
+    res.json({ message: "User Updated age updated", data: newUser });
   } catch (error) {
     res.json({ message: "Something went wrong", error });
   }
