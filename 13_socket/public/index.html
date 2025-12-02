@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <h1 style="text-align: center">Chatting application</h1>
+    <h4 class="users-count">Online Users : 0</h4>
+    <div class="user-join"></div>
+    <form class="input-message" style="margin-top: 10px">
+      <input type="text" name="" id="input" />
+      <button type="submit">Send</button>
+    </form>
+    <div class="messages">
+      <ul style="list-style: none; padding-left: 0"></ul>
+    </div>
+  </body>
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    const socket = io();
+    const userJoinDiv = document.querySelector(".user-join");
+    const form = document.querySelector(".input-message");
+    const messageInput = document.querySelector("#input");
+    const messagesUl = document.querySelector(".messages ul");
+
+    const username = prompt("Enter your username");
+
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();
+      const message = messageInput.value;
+      socket.emit("messageToServer", { username, message });
+      messageInput.value = "";
+    });
+
+    socket.emit("addUser", username);
+
+    socket.on("userJoin", joinUsers);
+    socket.on("userLeft", leftUser);
+    socket.on("messageToclients", updateMessages);
+    socket.on("userCount", updateUserCount);
+
+    function updateUserCount(count) {
+      const userCount = document.querySelector(".users-count");
+      console.log(count);
+      if (count == 0) {
+        userCount.textContent = "Online Users : 0";
+      } else {
+        userCount.textContent = `Online Users : ${count}`;
+      }
+    }
+
+    function updateMessages({ username, message }) {
+      const li = document.createElement("li");
+      li.textContent = `${username} : ${message}`;
+      messagesUl.appendChild(li);
+    }
+
+    function joinUsers(user) {
+      const p = document.createElement("p");
+      p.style.padding = "0";
+      p.style.margin = "0";
+      p.textContent = `${user} has joined`;
+      userJoinDiv.appendChild(p);
+    }
+
+    function leftUser(user) {
+      const p = document.createElement("p");
+      p.style.padding = "0";
+      p.style.margin = "0";
+      p.textContent = `${user} has left`;
+      userJoinDiv.appendChild(p);
+    }
+  </script>
+</html>
