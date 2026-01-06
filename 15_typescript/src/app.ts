@@ -1,36 +1,26 @@
-import express, { Express, Request, Response, NextFunction } from "express";
+type Todo = {
+  userId: number;
+  id: number;
+  title: string;
+  completed: boolean;
+};
 
-const app: Express = express();
-const PORT: number = 3000;
+async function getData(url: string): Promise<Todo[]> {
+  try {
+    const response = await fetch(url);
 
-app.use(express.json());
-
-interface CustomeRequest extends Request {
-  startTime?: number;
-}
-app.use("/", (req: CustomeRequest, res: Response, next: NextFunction) => {
-  req.startTime = Date.now();
-  next();
-});
-
-app.get("/", (req: Request, res: Response) => res.send("Hello"));
-
-interface User {
-  name: string;
-  email: string;
-}
-app.get(
-  "/user",
-  (req: Request<{}, {}, User>, res: Response, next: NextFunction) => {
-    // console.log(req);
-    const name = req?.body.name;
-    const email = req?.body.email;
-    res.json({ message: `User created: ${name}-${email}` });
+    if (!response.ok) {
+      throw new Error(`Network error, status: ${response.status}`);
+    }
+    const data: Todo[] = (await response.json()) as Todo[];
+    return data;
+  } catch (error) {
+    const errMessage =
+      error instanceof Error ? error.message : "there is a error";
+    console.log(errMessage);
+    return [];
   }
-);
-app.get("/user/:id", (req: Request<{ id: string }>, res: Response) => {
-  const id = req?.params?.id;
-  res.json({ message: `User id : ${id}` });
-});
+}
 
-app.listen(PORT, () => console.log("Server Running"));
+const data = getData("https://jsonplaceholder.typicode.com/todos");
+// console.log(data);
