@@ -1,5 +1,6 @@
 import redis from "redis";
 
+console.log("hello");
 const client = redis
   .createClient({
     host: "localhost",
