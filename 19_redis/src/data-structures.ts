@@ -52,7 +52,7 @@ async function testDataStructureRedis() {
 
     //Sorted Sets --> each member have score assosiated with them.
     //each data will be range according to the score.
-    //zAdd(add elements with sorted score), zRange(get all members),getRank(get the rank/position), zrem(remove 1 or more member)
+    //zAdd(add elements with sorted score), zRange(get all members), zrank(get the rank of a member), zrem(remove 1 or more member)
     // await client.zAdd("product:cart", [
     //   {
     //     value: "apple",
@@ -67,12 +67,28 @@ async function testDataStructureRedis() {
     //     score: 5,
     //   },
     // ]);
-    const addGrape = await client.zAdd("product:cart", [
-      { score: 10, value: "lichi" },
-    ]);
-    console.log(addGrape);
-    const productCart = await client.zRange("product:cart", 0, -1);
-    console.log(productCart);
+    // const addGrape = await client.zAdd("product:cart", [
+    //   { score: 10, value: "lichi" },
+    // ]);
+    // console.log(addGrape);
+    // const productCart = await client.zRange("product:cart", 0, -1);
+    // console.log(productCart);
+    // const mangoRank = await client.zRank("product:cart", "mango");
+    // console.log(mangoRank);
+    // const cart = await client.
+    // const removedProduct = await client.ZREM("product:cart", "mango");
+    // console.log(removedProduct);
+    // await client.del("product:cart");
+
+    //HASHEs. --> Hset(set a value of 1 or more fields), Hget(get the value), HgetAll(get all the feilds and value), hDel(delete a key value)
+
+    // await client.hSet("productsHSET", {
+    //   name: "Mobile",
+    //   desc: "it's a mobile",
+    // });
+    // await client.hDel("productsHSET", "desc");
+    // const allProducst = await client.hGetAll("productsHSET");
+    // console.log(allProducst);
   } catch (error) {
     console.log(error);
   } finally {
