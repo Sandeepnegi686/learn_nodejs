@@ -17,14 +17,13 @@ type RegistrationRequestBodyType = {
 async function registrationUser(
   req: Request<{}, {}, RegistrationRequestBodyType>,
   res: Response,
-  next: NextFunction,
 ) {
   logger.info("user registration start");
   if (!validateRegistration(req.body))
     throw new APIError("required all fields", 400);
   const { email, username, password } = req.body;
   const existingUser = await UserModel.find({ $or: [{ email }, { username }] });
-  if (existingUser) {
+  if (existingUser.length) {
     logger.warn("user already exists");
     throw new APIError("user already error", 400);
   }
@@ -36,7 +35,7 @@ async function registrationUser(
   }
 
   logger.warn("User saved successfully", user._id);
-  const { accessToken, refreshToken } = await generateToken(user);
+  const { accessToken, refreshToken } = await generateToken(user as any);
   return res.status(201).json({
     success: true,
     message: "user registraion successfull",
