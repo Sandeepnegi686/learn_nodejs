@@ -33,7 +33,7 @@ app.use(limiter);
 //Rate Limiter for routes or sensative endpoints
 app.use("/api/auth/register", sensitiveRateLimiter);
 
-//Routes
+//Routes.  ===>.   http://localhost:3001/api/auth/register
 app.use("/api/auth", indentityServiceRouter);
 
 //Error Handler
