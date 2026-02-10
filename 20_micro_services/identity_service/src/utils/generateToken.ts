@@ -5,7 +5,7 @@ import { Schema } from "mongoose";
 
 const JWT_SECRET = process.env.JWT_SECRET || "";
 
-type UserType = {
+export type UserType = {
   username: string;
   email: string;
   _id?: string;

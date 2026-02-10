@@ -5,6 +5,10 @@ type RegistrationRequestBodyType = {
   email: string;
   password: string;
 };
+type LoginRequestBodyType = {
+  email: string;
+  password: string;
+};
 
 function validateRegistration(data: RegistrationRequestBodyType) {
   const schema = joi.object({
@@ -13,7 +17,15 @@ function validateRegistration(data: RegistrationRequestBodyType) {
     password: joi.string().min(6).required(),
   });
 
-  return schema.valid(data);
+  return schema.validate(data);
+}
+function validateLogin(data: LoginRequestBodyType) {
+  const schema = joi.object({
+    email: joi.string().email().required(),
+    password: joi.string().min(6).required(),
+  });
+
+  return schema.validate(data);
 }
 
-export { validateRegistration };
+export { validateRegistration, validateLogin };

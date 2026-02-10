@@ -3,11 +3,17 @@ import { NextFunction, Request, Response } from "express";
 import UserModel from "../Model/User";
 import RefreshTokenModel from "../Model/RefreshToken";
 import logger from "../utils/logger";
-import { validateRegistration } from "../utils/validation";
+import { validateRegistration, validateLogin } from "../utils/validation";
 import { APIError } from "../middleware/errorHandler";
 import { generateToken } from "../utils/generateToken";
+import { argon2 } from "node:crypto";
 
 type RegistrationRequestBodyType = {
+  username: string;
+  email: string;
+  password: string;
+};
+type LoginRequestBodyType = {
   username: string;
   email: string;
   password: string;
@@ -19,8 +25,11 @@ async function registrationUser(
   res: Response,
 ) {
   logger.info("user registration start");
-  if (!validateRegistration(req.body))
-    throw new APIError("required all fields", 400);
+  const { error } = validateRegistration(req.body);
+  if (error) {
+    const errMsg = error?.details[0]?.message;
+    throw new APIError(errMsg, 400);
+  }
   const { email, username, password } = req.body;
   const existingUser = await UserModel.find({ $or: [{ email }, { username }] });
   if (existingUser.length) {
@@ -44,4 +53,42 @@ async function registrationUser(
   });
 }
 
-export { registrationUser };
+//Login
+async function loginUser(
+  req: Request<{}, {}, LoginRequestBodyType>,
+  res: Response,
+) {
+  logger.info("login endpoint hit");
+
+  const { error } = validateLogin(req.body);
+  if (error) {
+    const errMsg = error?.details[0]?.message;
+    throw new APIError(errMsg, 400);
+  }
+  const { email, password } = req.body;
+  const existingUser = await UserModel.findOne({ email }).select("+password");
+  if (!existingUser) {
+    throw new APIError("user not found", 400);
+  }
+  // const isValidPassword = await existingUser.comparePassword(password);
+
+  // if (!isValidPassword) {
+  //   throw new APIError("password incorrect", 400);
+  // }
+
+  // const { accessToken, refreshToken } = await generateToken(user);
+  // return res
+  //   .status(200)
+  //   .json({ success: true, accessToken, refreshToken, user: existingUser });
+  // const passTrue = await argon2.verify(existingUser.password, password);
+  // if (passTrue) {
+  // }
+  // console.log(existingUser);
+  // if()
+  // if (await argon2.verify("<big long hash>", "password")) {
+  // }
+  return res.status(200).json({ success: true, data: existingUser });
+  // const const
+}
+
+export { registrationUser, loginUser };
