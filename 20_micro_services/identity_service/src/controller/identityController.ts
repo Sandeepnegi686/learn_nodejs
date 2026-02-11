@@ -1,14 +1,11 @@
 import { NextFunction, Request, Response } from "express";
 
 import UserModel from "../Model/User";
-import RefreshTokenModel from "../Model/RefreshToken";
 import logger from "../utils/logger";
 import { validateRegistration, validateLogin } from "../utils/validation";
 import { APIError } from "../middleware/errorHandler";
 import { generateToken } from "../utils/generateToken";
-import { argon2 } from "node:crypto";
 import RefreshToken from "../Model/RefreshToken";
-import { unlink } from "node:fs";
 
 type RegistrationRequestBodyType = {
   username: string;

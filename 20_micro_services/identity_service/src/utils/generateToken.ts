@@ -1,7 +1,6 @@
 import jwt from "jsonwebtoken";
 import crypto from "crypto";
 import RefreshToken from "../Model/RefreshToken";
-import { Schema } from "mongoose";
 
 const JWT_SECRET = process.env.JWT_SECRET || "";
 
