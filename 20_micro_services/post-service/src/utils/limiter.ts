@@ -3,7 +3,7 @@ import logger from "./logger";
 import RedisStore, { type RedisReply } from "rate-limit-redis";
 import client from "./redisConfig";
 
-const sensitiveRateLimiter = rateLimit({
+const limitter = rateLimit({
   windowMs: 5 * 60 * 1000, // 5 minutes
   limit: 300, // Limit each IP to 10 requests per `window` (here, per 15 minutes).
   standardHeaders: "draft-8", // draft-6: `RateLimit-*` headers; draft-7 & draft-8: combined `RateLimit` header
@@ -16,9 +16,10 @@ const sensitiveRateLimiter = rateLimit({
       .json({ success: false, message: "Rate Limit exceed" });
   },
   store: new RedisStore({
+    prefix: "post-service-rate-limiter",
     sendCommand: (command: string, ...args: string[]) =>
       client.call(command, ...args) as Promise<RedisReply>,
   }),
 });
 
-export default sensitiveRateLimiter;
+export default limitter;
