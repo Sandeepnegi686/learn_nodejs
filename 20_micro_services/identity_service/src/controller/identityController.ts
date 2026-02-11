@@ -7,6 +7,8 @@ import { validateRegistration, validateLogin } from "../utils/validation";
 import { APIError } from "../middleware/errorHandler";
 import { generateToken } from "../utils/generateToken";
 import { argon2 } from "node:crypto";
+import RefreshToken from "../Model/RefreshToken";
+import { unlink } from "node:fs";
 
 type RegistrationRequestBodyType = {
   username: string;
@@ -70,25 +72,56 @@ async function loginUser(
   if (!existingUser) {
     throw new APIError("user not found", 400);
   }
-  // const isValidPassword = await existingUser.comparePassword(password);
+  const isValidPassword = await existingUser.comparePassword(password);
 
-  // if (!isValidPassword) {
-  //   throw new APIError("password incorrect", 400);
-  // }
+  if (!isValidPassword) {
+    throw new APIError("password incorrect", 400);
+  }
 
-  // const { accessToken, refreshToken } = await generateToken(user);
-  // return res
-  //   .status(200)
-  //   .json({ success: true, accessToken, refreshToken, user: existingUser });
-  // const passTrue = await argon2.verify(existingUser.password, password);
-  // if (passTrue) {
-  // }
-  // console.log(existingUser);
-  // if()
-  // if (await argon2.verify("<big long hash>", "password")) {
-  // }
-  return res.status(200).json({ success: true, data: existingUser });
-  // const const
+  const { accessToken, refreshToken } = await generateToken(
+    existingUser as any,
+  );
+  return res
+    .status(200)
+    .json({ success: true, accessToken, refreshToken, user: existingUser._id });
 }
 
-export { registrationUser, loginUser };
+type RefreshTokenBodyType = { refreshToken: string };
+async function refreshToken(
+  req: Request<{}, {}, RefreshTokenBodyType>,
+  res: Response,
+) {
+  logger.info("Refresh endpoint hit.");
+  const refreshToken = req?.body?.refreshToken;
+  if (!refreshToken) throw new APIError("refresh token is not present", 400);
+  const storedToken = await RefreshToken.findOne({ token: refreshToken });
+  if (!storedToken || storedToken.expiresAt < new Date()) {
+    logger.warn("invalid token");
+    throw new APIError("invalid or expire token", 401);
+  }
+  const user = await UserModel.findById(storedToken.user);
+  if (!user) throw new APIError("user not found", 401);
+  const { accessToken: newAccessToken, refreshToken: newRefreshToken } =
+    await generateToken(user as any);
+
+  //delete the old refresh token
+  await RefreshToken.deleteOne({ _id: storedToken._id });
+  res.json({
+    success: true,
+    accessToken: newAccessToken,
+    refreshToken: newRefreshToken,
+  });
+}
+
+type LogoutBodyType = { refreshToken: string };
+async function logout(req: Request<{}, {}, LogoutBodyType>, res: Response) {
+  logger.info("Logout endpoint hit");
+  const refreshToken = req?.body?.refreshToken;
+  if (!refreshToken) throw new APIError("token not found", 401);
+  await RefreshToken.deleteOne({ token: refreshToken });
+  return res
+    .status(200)
+    .json({ success: true, message: "refresh token deleted successfully" });
+}
+
+export { registrationUser, loginUser, refreshToken, logout };
