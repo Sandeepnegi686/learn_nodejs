@@ -11,8 +11,6 @@ import cors from "cors";
 import helmet from "helmet";
 import { errorHandler } from "./middleware/errorHandler";
 import limitter from "./utils/rateLimitter";
-import client from "./utils/redisConfig";
-import Redis from "ioredis";
 import addRedisClientToReq from "./middleware/addRedisClient";
 
 const app = express();
