@@ -7,7 +7,6 @@ const opts = {
   // Basic options
   storeClient: client,
   keyPrefix: "rate-limit-all-routes", // redis key
-  useRedisPackage: true, // use this flag for the latest redis package
   points: 5, // Number of points
   duration: 5, // Per second(s)
 

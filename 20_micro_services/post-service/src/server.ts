@@ -1,4 +1,4 @@
-import express from "express";
+import express, { NextFunction, Response } from "express";
 import postRouter from "./routes/postRoutes";
 import authenticateUser from "./middleware/authMiddleware";
 import logger from "./utils/logger";
@@ -11,13 +11,16 @@ import cors from "cors";
 import helmet from "helmet";
 import { errorHandler } from "./middleware/errorHandler";
 import limitter from "./utils/rateLimitter";
+import client from "./utils/redisConfig";
+import Redis from "ioredis";
+import addRedisClientToReq from "./middleware/addRedisClient";
 
 const app = express();
 app.use(express.json());
 app.use(cors());
 app.use(helmet());
 
-app.use("/post", authenticateUser, postRouter);
+app.use("/api/post", authenticateUser, addRedisClientToReq, postRouter);
 
 //DDos for IP based
 app.use(limitter);
