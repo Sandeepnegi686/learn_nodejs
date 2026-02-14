@@ -57,6 +57,7 @@ app.use(
     proxyReqOptDecorator: (proxyReqOpts, srcReq) => {
       // you can update headers
       proxyReqOpts.headers["Content-Type"] = "application/json";
+      proxyReqOpts.headers["x-user-id"] = srcReq.user.userId;
       return proxyReqOpts;
     },
     userResDecorator: (proxyRes, proxyResData, userReq, userRes) => {

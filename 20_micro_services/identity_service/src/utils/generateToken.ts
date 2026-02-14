@@ -15,7 +15,7 @@ async function generateToken(user: UserType) {
   const accessToken = jwt.sign(
     { userId: user._id, username: user.username },
     JWT_SECRET,
-    { expiresIn: "60m" },
+    { expiresIn: "7d" },
   );
   const refreshToken = crypto.randomBytes(30).toString("hex");
   const expiresAt = new Date();
