@@ -18,6 +18,12 @@ app.use(express.json());
 app.use(cors());
 app.use(helmet());
 
+//middleware
+app.use("/", (req, res, next) => {
+  logger.info(`Received ${req.method} request to ${req.url}`);
+  next();
+});
+
 app.use("/api/post", authenticateUser, addRedisClientToReq, postRouter);
 
 //DDos for IP based

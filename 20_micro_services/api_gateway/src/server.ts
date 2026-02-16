@@ -15,6 +15,7 @@ dotenv.config();
 const PORT = process.env.PORT || 0;
 const IDENTITY_SERVICE_URL = process.env.IDENTITY_SERVICE_URL || "";
 const POST_SERVICE_URL = process.env.POST_SERVICE_URL || "";
+const MEDIA_SERVICE_URL = process.env.MEDIA_SERVICE_URL || "";
 
 //middlewares
 app.use(cors());
@@ -66,6 +67,30 @@ app.use(
       );
       return proxyResData;
     },
+  }),
+);
+
+//Setting up proxy for media service
+app.use(
+  "/v1/media",
+  validateToken,
+  proxy(MEDIA_SERVICE_URL, {
+    ...proxyOptions,
+    proxyReqOptDecorator: (proxyReqOpts, srcReq) => {
+      // you can update headers
+      proxyReqOpts.headers["x-user-id"] = srcReq.user.userId;
+      if (!srcReq.headers["content-type"]?.startsWith("multipart/form-data")) {
+        proxyReqOpts.headers["Content-Type"] = "multipart/form-data";
+      }
+      return proxyReqOpts;
+    },
+    userResDecorator: (proxyRes, proxyResData, userReq, userRes) => {
+      logger.info(
+        `Response received from Media service : ${proxyRes.statusCode}`,
+      );
+      return proxyResData;
+    },
+    parseReqBody: false, //entire request file will be proxied for the file upload
   }),
 );
 
