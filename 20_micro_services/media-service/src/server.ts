@@ -9,6 +9,7 @@ import limiter from "./utils/limmiter";
 
 const PORT = process.env.PORT || 0;
 const DATABASE_URL = process.env.DATABASE_URL || "";
+const RABIT_MQ = process.env.RABIT_MQ || "";
 
 import { errorHandler } from "./middleware/errorHandler";
 import validateToken from "./middleware/validateToken";

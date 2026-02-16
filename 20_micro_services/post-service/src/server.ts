@@ -12,6 +12,7 @@ import helmet from "helmet";
 import { errorHandler } from "./middleware/errorHandler";
 import limitter from "./utils/rateLimitter";
 import addRedisClientToReq from "./middleware/addRedisClient";
+import connectRabbitMQ from "./utils/rabbitmq";
 
 const app = express();
 app.use(express.json());
@@ -34,6 +35,7 @@ app.use(errorHandler);
 
 app.listen(PORT, () => {
   logger.info(`Server started at PORT: ${PORT}`);
+  connectRabbitMQ();
   connect(DATABASE_URL)
     .then(() => logger.info("Database connected"))
     .catch((e) => logger.error(e.message));

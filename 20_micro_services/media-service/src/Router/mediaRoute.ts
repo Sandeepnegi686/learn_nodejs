@@ -4,7 +4,7 @@ import upload from "../config/multer";
 import multer from "multer";
 import logger from "../utils/logger";
 import { APIError } from "../middleware/errorHandler";
-import { uploadMedia } from "../Controller/MediaController";
+import { getAllMedia, uploadMedia } from "../Controller/MediaController";
 
 const router = express.Router();
 
@@ -26,5 +26,7 @@ router.post(
   },
   uploadMedia,
 );
+
+router.get("/get-all-media", authenticateUser, getAllMedia);
 
 export default router;

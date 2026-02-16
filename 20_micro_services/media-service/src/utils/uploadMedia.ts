@@ -26,4 +26,10 @@ function uploadMediaToCloudinary(
   });
 }
 
-export { uploadMediaToCloudinary };
+async function deleteMediaFromCloudinary(publicId: string) {
+  const result = await cloudinary.uploader.destroy(publicId);
+  logger.info("media deleted successfully from cloud storage.");
+  return result;
+}
+
+export { uploadMediaToCloudinary, deleteMediaFromCloudinary };

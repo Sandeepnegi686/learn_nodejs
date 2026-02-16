@@ -40,4 +40,9 @@ async function uploadMedia(req: Request, res: Response) {
   }
 }
 
-export { uploadMedia };
+async function getAllMedia(req: Request, res: Response) {
+  const media = await MediaModel.find();
+  return res.status(200).json({ success: true, data: media });
+}
+
+export { uploadMedia, getAllMedia };
