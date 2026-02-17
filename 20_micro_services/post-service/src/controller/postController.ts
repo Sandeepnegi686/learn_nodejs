@@ -4,6 +4,7 @@ import { Request, Response } from "express";
 import logger from "../utils/logger";
 import { postValidation } from "../middleware/validation";
 import { Types } from "mongoose";
+import { publishEvent } from "../utils/rabbitmq";
 
 // Extend Express Request interface to include 'user'
 declare global {
@@ -114,6 +115,14 @@ async function deletePost(
   const post = await PostModel.findByIdAndDelete(postId);
   if (post) {
     await req.redisClient?.del(`post:${postId}`);
+    await publishEvent(
+      "post.deleted",
+      JSON.stringify({
+        postId,
+        userId: req.user.userId,
+        mediaIds: post.mediaIds,
+      }),
+    );
     return res.status(200).json({
       success: true,
       message: "Post Deleted Successfully",

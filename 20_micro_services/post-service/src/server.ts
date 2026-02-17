@@ -12,7 +12,7 @@ import helmet from "helmet";
 import { errorHandler } from "./middleware/errorHandler";
 import limitter from "./utils/rateLimitter";
 import addRedisClientToReq from "./middleware/addRedisClient";
-import connectRabbitMQ from "./utils/rabbitmq";
+import { connectRabbitMQ } from "./utils/rabbitmq";
 
 const app = express();
 app.use(express.json());

@@ -2,7 +2,7 @@ import amqplib from "amqplib";
 import logger from "./logger";
 
 let connection = null;
-let channel = null;
+let channel: any = null;
 
 const EXCHANGE_NAME = "social_event";
 const RABIT_MQ = process.env.RABIT_MQ || "";
@@ -19,4 +19,16 @@ async function connectRabbitMQ() {
   }
 }
 
-export default connectRabbitMQ;
+async function publishEvent(routingKey: string, message: string) {
+  if (!channel) {
+    await connectRabbitMQ();
+  }
+  channel.publish(
+    EXCHANGE_NAME,
+    routingKey,
+    Buffer.from(JSON.stringify(message)),
+  );
+  logger.info(`Event published: ${routingKey}`);
+}
+
+export { connectRabbitMQ, publishEvent };
