@@ -9,10 +9,11 @@ import limiter from "./utils/limmiter";
 
 const PORT = process.env.PORT || 0;
 const DATABASE_URL = process.env.DATABASE_URL || "";
-const RABIT_MQ = process.env.RABIT_MQ || "";
 
 import { errorHandler } from "./middleware/errorHandler";
 import validateToken from "./middleware/validateToken";
+import { connectRabbitMQ, consumeEvent } from "./utils/rabbitmq";
+import handlePostDeleted from "./eventhandlers/mediaEventHandler";
 
 const app = express();
 app.use(express.json());
@@ -37,9 +38,24 @@ app.use("/api/media", mediaRouter);
 //Error Handler
 app.use(errorHandler);
 
-app.listen(PORT, () => {
-  logger.info(`Server started at PORT: ${PORT}`);
-  connect(DATABASE_URL)
-    .then(() => logger.info("Database connected"))
-    .catch((e) => logger.error(e.message));
-});
+//Server
+async function startServer() {
+  try {
+    await connectRabbitMQ();
+
+    //consume all the events
+    await consumeEvent("post.deleted", handlePostDeleted);
+
+    app.listen(PORT, () => {
+      logger.info(`Server started at PORT: ${PORT}`);
+      connect(DATABASE_URL)
+        .then(() => logger.info("Database connected"))
+        .catch((e) => logger.error(e.message));
+    });
+  } catch (error) {
+    logger.error(error);
+    process.exit(1);
+  }
+}
+
+startServer();
