@@ -13,7 +13,6 @@ async function uploadMedia(req: Request, res: Response) {
     }
     const { originalname, mimetype, buffer } = req.file;
     const userId = req.user?.userId;
-    console.log(originalname, mimetype, buffer, userId);
     const cloudinaryUploadResult = await uploadMediaToCloudinary(req.file);
     logger.info(
       `cloudinary upload successfull. Public : ${cloudinaryUploadResult.public_id}`,

@@ -37,11 +37,11 @@ async function consumeEvent(routingKey: string, callback: any) {
   }
   const q = await channel.assertQueue("", { exclusive: true });
   await channel.bindQueue(q.queue, EXCHANGE_NAME, routingKey);
-  channel.consume(q.queue, (msg: string) => {
+  channel.consume(q.queue, (msg: any) => {
     if (msg !== null) {
-      const content = JSON.parse(msg);
+      const content = msg.content.toString();
       callback(content);
-      channel.ack();
+      channel.ack(msg);
     }
   });
   logger.info(`subscribe to event : ${routingKey}`);

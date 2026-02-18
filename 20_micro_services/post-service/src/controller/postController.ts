@@ -25,7 +25,7 @@ async function invalidPostsCache(req: Request) {
   }
 }
 
-type CreatePostType = { content: string; mediaIds?: string[] };
+type CreatePostType = { content: string; mediaIds: string[] };
 async function createPost(req: Request<{}, {}, CreatePostType>, res: Response) {
   const content = req?.body?.content;
   const mediaIds = req?.body?.mediaIds;
