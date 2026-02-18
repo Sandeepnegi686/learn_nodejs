@@ -37,7 +37,6 @@ async function createPost(req: Request<{}, {}, CreatePostType>, res: Response) {
   if (!content) throw new APIError("Content is not provided", 400);
   const user = req.user as any;
   if (!user.userId) throw new APIError("user is missing", 400);
-  //   const user = req.user.userId as string;
 
   const newlyCreatedPost = new PostModel({
     content,
@@ -45,6 +44,15 @@ async function createPost(req: Request<{}, {}, CreatePostType>, res: Response) {
     user: user.userId,
   });
   await newlyCreatedPost.save();
+  await publishEvent(
+    "post.created",
+    JSON.stringify({
+      postId: newlyCreatedPost._id,
+      userId: newlyCreatedPost.user,
+      content: newlyCreatedPost.content,
+      createdAt: newlyCreatedPost.createdAt,
+    }),
+  );
   //deleting all the keys/posts from redis
   await invalidPostsCache(req);
 

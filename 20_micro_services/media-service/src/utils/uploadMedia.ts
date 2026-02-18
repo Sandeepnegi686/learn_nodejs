@@ -1,4 +1,3 @@
-import express, { Express, NextFunction, Request, Response } from "express";
 import cloudinary from "../config/cloudinary";
 import logger from "./logger";
 import { UploadApiResponse } from "cloudinary";
