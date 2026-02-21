@@ -16,6 +16,7 @@ const PORT = process.env.PORT || 0;
 const IDENTITY_SERVICE_URL = process.env.IDENTITY_SERVICE_URL || "";
 const POST_SERVICE_URL = process.env.POST_SERVICE_URL || "";
 const MEDIA_SERVICE_URL = process.env.MEDIA_SERVICE_URL || "";
+const SEARCH_SERVICE_URL = process.env.SEARCH_SERVICE_URL || "";
 
 //middlewares
 app.use(cors());
@@ -91,6 +92,26 @@ app.use(
       return proxyResData;
     },
     parseReqBody: false, //entire request file will be proxied for the file upload
+  }),
+);
+
+//Setting up proxy for search service
+app.use(
+  "/v1/search",
+  validateToken,
+  proxy(SEARCH_SERVICE_URL, {
+    ...proxyOptions,
+    proxyReqOptDecorator: (proxyReqOpts, srcReq) => {
+      // you can update headers
+      proxyReqOpts.headers["x-user-id"] = srcReq.user.userId;
+      return proxyReqOpts;
+    },
+    userResDecorator: (proxyRes, proxyResData, userReq, userRes) => {
+      logger.info(
+        `Response received from Search service : ${proxyRes.statusCode}`,
+      );
+      return proxyResData;
+    },
   }),
 );
 

@@ -12,7 +12,10 @@ app.use(helmet());
 
 import { connect } from "mongoose";
 import { connectRabbitMQ, consumeEvent } from "./utils/rabbitmq";
-import { handlePostCreated } from "./Events/searchEventHandler";
+import {
+  handlePostCreated,
+  handlePostDeleted,
+} from "./Events/searchEventHandler";
 
 const PORT = process.env.PORT || 0;
 const DATABASE_URL = process.env.DATABASE_URL || "";
@@ -36,6 +39,7 @@ async function startServer() {
 
     //consume all the events
     await consumeEvent("post.created", handlePostCreated);
+    await consumeEvent("post.deleted", handlePostDeleted);
 
     app.listen(PORT, () => {
       logger.info(`Server started at PORT: ${PORT}`);

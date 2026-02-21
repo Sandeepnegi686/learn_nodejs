@@ -32,7 +32,7 @@ async function publishEvent(routingKey: string, message: string) {
 }
 
 async function consumeEvent(routingKey: string, callback: any) {
-  if (channel) {
+  if (!channel) {
     await connectRabbitMQ();
   }
   const q = await channel.assertQueue("", { exclusive: true });

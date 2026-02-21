@@ -122,7 +122,12 @@ async function deletePost(
   }
   const post = await PostModel.findByIdAndDelete(postId);
   if (post) {
-    await req.redisClient?.del(`post:${postId}`);
+    //Deleting redis cache
+    const postKeys = await req.redisClient?.keys("posts:*");
+    if (postKeys?.length) {
+      await req.redisClient?.del(postKeys);
+    }
+    //Publishing a event which will delete media
     await publishEvent(
       "post.deleted",
       JSON.stringify({

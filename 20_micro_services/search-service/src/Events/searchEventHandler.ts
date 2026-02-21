@@ -4,8 +4,9 @@ import logger from "../utils/logger";
 
 async function handlePostCreated(event: string) {
   try {
-    const { postId, userId, createdAt, content } = JSON.parse(event);
-    console.log(JSON.parse(JSON.parse(event)));
+    const { postId, userId, createdAt, content } = JSON.parse(
+      JSON.parse(event),
+    );
     const newSearchPost = new SearchModel({
       postId,
       userId,
@@ -22,4 +23,15 @@ async function handlePostCreated(event: string) {
   }
 }
 
-export { handlePostCreated };
+async function handlePostDeleted(event: string) {
+  try {
+    const { postId } = JSON.parse(JSON.parse(event));
+    await SearchModel.findOneAndDelete({ postId });
+    logger.info(`Search post Deleted: ${postId}`);
+  } catch (error) {
+    if (error instanceof Error) logger.error(error.message as string);
+    throw new APIError("something went wrong while deleting search post", 500);
+  }
+}
+
+export { handlePostCreated, handlePostDeleted };
